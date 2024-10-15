@@ -151,3 +151,67 @@ func DeleteUser(id int) error {
 	}
 	return nil
 }
+
+func listUsers() ([]Userdata, error) {
+	Data := []Userdata{}
+	db, err := openConnection()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	statement := `SELECT ID, Username, Name, Surname, Description
+		FROM USERS, Userdata WHERE Users.ID = Userdata.UserID`
+
+	rows, err := db.Query(statement)
+
+	if err != nil {
+		return Data, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int
+		var username string
+		var name string
+		var surname string
+		var description string
+
+		err = rows.Scan(&id, &username, &name, &surname, &description)
+		if err != nil {
+			return nil, err
+		}
+
+		temp := Userdata{ID: id, Username: username, Name: name, Surname: surname, Description: description}
+		Data = append(Data, temp)
+	}
+	return Data, nil
+}
+
+// UpdateUser is for updating an existing user
+func UpdateUser(d Userdata) error {
+	db, err := openConnection()
+
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	// Let's check if the user exists first
+	userID := exists(d.Username)
+
+	if userID == -1 {
+		return fmt.Errorf("the user %s does not exist", d.Username)
+	}
+
+	statement := `UPDATE Userdata set Name = ?, Surname = ?, Description = ? WHERE UserID = ?`
+
+	_, err = db.Exec(statement, d.Name, d.Surname, d.Description, d.ID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
