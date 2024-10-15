@@ -1,3 +1,12 @@
+// INFO: Since we are using an external package in this code, this program
+// should be placed under ~/go/src folder.
+// In my case, it is located under `/home/tuna/go/src/github.com/tunacinsoy/mGo4th/ch06/sqlite06`
+// After placing it there, the commands `go mod init` and `go mod tidy` should be run.
+
+// Reference: https://github.com/mactsouk/sqlite06
+// The aim of this program is to define most-used operations on sqlite db and provide these
+// functions as go package named sqlite06
+
 package sqlite06
 
 import (
