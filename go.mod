@@ -1,4 +1,4 @@
-module github.com/tunacinsoy/mGo4th/ch06/sqlite06
+module github.com/tunacinsoy/sqlite06
 
 go 1.23.2
 
