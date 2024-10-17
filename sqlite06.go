@@ -165,7 +165,7 @@ func DeleteUser(id int) error {
 	return nil
 }
 
-func listUsers() ([]Userdata, error) {
+func ListUsers() ([]Userdata, error) {
 	Data := []Userdata{}
 	db, err := openConnection()
 	if err != nil {
