@@ -3,10 +3,9 @@
 // In my case, it is located under `/home/tuna/go/src/github.com/tunacinsoy/mGo4th/ch06/sqlite06`
 // After placing it there, the commands `go mod init` and `go mod tidy` should be run.
 
-// Reference: https://github.com/mactsouk/sqlite06
+// Source: https://github.com/tunacinsoy/sqlite06
 // The aim of this program is to define most-used operations on sqlite db and provide these
 // functions as go package named sqlite06
-
 package sqlite06
 
 import (
@@ -43,6 +42,8 @@ func openConnection() (*sql.DB, error) {
 }
 
 // This function is also private
+// Returns the ID of a user whose username is provided in as input parameter
+// Returns -1 if there's an error, or user is not found
 func exists(username string) int {
 	username = strings.ToLower(username)
 	// As said above, we can use openConnection() function within the scope of this package
@@ -103,10 +104,12 @@ func AddUser(d Userdata) int {
 	}
 
 	// User has been created in Users table, let's check it
-	if exists(d.Username) == -1 {
+	userID = exists(d.Username)
+	if userID == -1 {
 		return -1
 	}
 
+	// `userID` field of Userdata table is the same value from Users table `ID` field
 	insertStatement = `INSERT INTO Userdata values (?,?,?,?)`
 	_, err = db.Exec(insertStatement, userID, d.Name, d.Surname, d.Description)
 
@@ -142,10 +145,11 @@ func DeleteUser(id int) error {
 		}
 	}
 
-	if exists(username) != id {
+	if exists(username) == -1 {
 		return fmt.Errorf("user with ID %d does not exist", id)
 	}
 
+	// At this point, we are sure that userID exists in both tables
 	deleteStatement := `DELETE FROM Userdata WHERE UserID = ?`
 	_, err = db.Exec(deleteStatement, id)
 	if err != nil {
