@@ -212,6 +212,7 @@ func UpdateUser(d Userdata) error {
 	defer db.Close()
 
 	// Let's check if the user exists first
+	d.Username = strings.ToLower(d.Username)
 	userID := exists(d.Username)
 
 	if userID == -1 {
