@@ -218,6 +218,7 @@ func UpdateUser(d Userdata) error {
 		return fmt.Errorf("the user %s does not exist", d.Username)
 	}
 
+	d.ID = userID
 	statement := `UPDATE Userdata set Name = ?, Surname = ?, Description = ? WHERE UserID = ?`
 
 	_, err = db.Exec(statement, d.Name, d.Surname, d.Description, d.ID)
