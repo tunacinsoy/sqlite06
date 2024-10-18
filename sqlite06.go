@@ -34,6 +34,12 @@ func openConnection() (*sql.DB, error) {
 	// Before calling this func, programmer has to set `Filename` variable using:
 	// sqlite06.Filename = "ch06.db" for instance.
 	// SQLite3 does not require a username or a password and does not operate over a TCP/IP network.
+
+	// Checking if user set the filename correctly
+	if Filename == "" {
+		return nil, fmt.Errorf("database filename is not set")
+	}
+
 	db, err := sql.Open("sqlite3", Filename)
 	if err != nil {
 		return nil, err
@@ -50,6 +56,7 @@ func exists(username string) int {
 	db, err := openConnection()
 	if err != nil {
 		fmt.Println(err)
+		return -1
 	}
 	defer db.Close()
 
@@ -100,12 +107,6 @@ func AddUser(d Userdata) int {
 	_, err = db.Exec(insertStatement, d.Username)
 	if err != nil {
 		fmt.Println(err)
-		return -1
-	}
-
-	// User has been created in Users table, let's check it
-	userID = exists(d.Username)
-	if userID == -1 {
 		return -1
 	}
 
@@ -173,8 +174,11 @@ func ListUsers() ([]Userdata, error) {
 	}
 	defer db.Close()
 
+	// statement := `SELECT ID, Username, Name, Surname, Description
+	// 	FROM USERS, Userdata WHERE Users.ID = Userdata.UserID`
+
 	statement := `SELECT ID, Username, Name, Surname, Description
-		FROM USERS, Userdata WHERE Users.ID = Userdata.UserID`
+              FROM Users INNER JOIN Userdata ON Users.ID = Userdata.UserID`
 
 	rows, err := db.Query(statement)
 
@@ -220,7 +224,8 @@ func UpdateUser(d Userdata) error {
 	}
 
 	d.ID = userID
-	statement := `UPDATE Userdata set Name = ?, Surname = ?, Description = ? WHERE UserID = ?`
+
+	statement := `UPDATE Userdata SET Name = ?, Surname = ?, Description = ? WHERE UserID = ?`
 
 	_, err = db.Exec(statement, d.Name, d.Surname, d.Description, d.ID)
 
