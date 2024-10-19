@@ -46,29 +46,56 @@ func openConnection() (*sql.DB, error) {
 // This function is also private
 // Returns the ID of a user whose username is provided in as input parameter
 // Returns -1 if there's an error, or user is not found
+// func exists(username string) int {
+// 	username = strings.ToLower(username)
+// 	// As said above, we can use openConnection() function within the scope of this package
+// 	db, err := openConnection()
+// 	if err != nil {
+// 		fmt.Println("Database connection could not be established in func exists().")
+// 		fmt.Println(err)
+// 		return -1
+// 	}
+// 	defer db.Close()
+
+// 	// This one is prone to sql injection attacks
+// 	// statement := fmt.Sprintf(`SELECT ID FROM Users where Username = '%s'`, username)
+
+// 	statement := "SELECT ID FROM Users WHERE Username = ?"
+// 	rows, err := db.Query(statement, username)
+// 	if err != nil {
+// 		fmt.Println("Error retrieving username:", err)
+// 		return -1
+// 	}
+// 	defer rows.Close()
+
+// 	userID := -1
+// 	for rows.Next() {
+// 		var id int
+// 		err = rows.Scan(&id)
+// 		if err != nil {
+// 			fmt.Println("exists() Scan", err)
+// 			return -1
+// 		}
+// 		userID = id
+// 	}
+// 	return userID
+// }
+
 func exists(username string) int {
 	username = strings.ToLower(username)
-	// As said above, we can use openConnection() function within the scope of this package
+
 	db, err := openConnection()
 	if err != nil {
-		fmt.Println("Database connection could not be established in func exists().")
 		fmt.Println(err)
 		return -1
 	}
 	defer db.Close()
 
-	// This one is prone to sql injection attacks
-	// statement := fmt.Sprintf(`SELECT ID FROM Users where Username = '%s'`, username)
-
-	statement := "SELECT ID FROM Users WHERE Username = ?"
-	rows, err := db.Query(statement, username)
-	if err != nil {
-		fmt.Println("Error retrieving username:", err)
-		return -1
-	}
+	userID := -1
+	statement := fmt.Sprintf(`SELECT ID FROM Users where Username = '%s'`, username)
+	rows, _ := db.Query(statement)
 	defer rows.Close()
 
-	userID := -1
 	for rows.Next() {
 		var id int
 		err = rows.Scan(&id)
