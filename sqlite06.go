@@ -35,13 +35,9 @@ func openConnection() (*sql.DB, error) {
 	// sqlite06.Filename = "ch06.db" for instance.
 	// SQLite3 does not require a username or a password and does not operate over a TCP/IP network.
 
-	// Checking if user set the filename correctly
-	if Filename == "" {
-		return nil, fmt.Errorf("database filename is not set")
-	}
-
 	db, err := sql.Open("sqlite3", Filename)
 	if err != nil {
+		fmt.Println("Database connection could not be established in func openConnection().")
 		return nil, err
 	}
 	return db, nil
@@ -55,6 +51,7 @@ func exists(username string) int {
 	// As said above, we can use openConnection() function within the scope of this package
 	db, err := openConnection()
 	if err != nil {
+		fmt.Println("Database connection could not be established in func exists().")
 		fmt.Println(err)
 		return -1
 	}
@@ -92,6 +89,7 @@ func AddUser(d Userdata) int {
 
 	db, err := openConnection()
 	if err != nil {
+		fmt.Println("Database connection could not be established in func AddUser().")
 		fmt.Println(err)
 		return -1
 	}
@@ -124,6 +122,7 @@ func AddUser(d Userdata) int {
 func DeleteUser(id int) error {
 	db, err := openConnection()
 	if err != nil {
+		fmt.Println("Database connection could not be established in func DeleteUser().")
 		return err
 	}
 	defer db.Close()
@@ -170,6 +169,7 @@ func ListUsers() ([]Userdata, error) {
 	Data := []Userdata{}
 	db, err := openConnection()
 	if err != nil {
+		fmt.Println("Database connection could not be established in func ListUsers().")
 		return nil, err
 	}
 	defer db.Close()
