@@ -6,6 +6,37 @@
 // Source: https://github.com/tunacinsoy/sqlite06
 // The aim of this program is to define most-used operations on sqlite db and provide these
 // functions as go package named sqlite06
+
+/*
+	It is highly recommended that each Go package you create has a block comment
+	preceding the package declaration that introduces developers to the package, and
+	also explains what the package does.
+
+The package works on 2 tables on an SQLite database.
+
+The names of the tables are:
+
+  - Users
+  - Userdata
+
+The definitions of the tables are:
+
+	CREATE TABLE Users (
+	    ID INTEGER PRIMARY KEY,
+	    Username TEXT
+	);
+
+	CREATE TABLE Userdata (
+	    UserID INTEGER NOT NULL,
+	    Name TEXT,
+	    Surname TEXT,
+	    Description TEXT
+	);
+
+
+	// BUG(1): Function ListUsers() not working as expected
+	// BUG(2): Function AddUser() is too slow
+*/
 package sqlite06
 
 import (
@@ -16,11 +47,18 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+/*
+This global variable holds the SQLite3 database filepath
+
+	Filename: Is the filepath to the database file
+*/
+
 var (
 	Filename = ""
 )
 
-// Most of the time, you need as many structures as there are database tables
+// Most of the time, you need as many structures as there are database tables, however,
+// since this a light package, we can combine fields of Users and Userdata table in one struct
 type Userdata struct {
 	ID          int
 	Username    string
@@ -30,6 +68,8 @@ type Userdata struct {
 }
 
 // This function is private and only accessed within the scope of this package (starts with lowercase letter)
+// openConnection() is for opening the SQLite3 connection
+// in order to be used by the other functions of the package
 func openConnection() (*sql.DB, error) {
 	// Before calling this func, programmer has to set `Filename` variable using:
 	// sqlite06.Filename = "ch06.db" for instance.
@@ -59,6 +99,11 @@ func exists(username string) int {
 
 	// This one is prone to sql injection attacks
 	// statement := fmt.Sprintf(`SELECT ID FROM Users where Username = '%s'`, username)
+	/*
+		 	For instance, if a hacker sets username as ' OR '1'='1'
+			This changes the query to SELECT ID FROM Users where Username = '' OR '1'='1'
+			This query will return all records in the Users table, potentially giving the attacker unauthorized access.
+	*/
 
 	statement := "SELECT ID FROM Users WHERE Username = ?"
 	rows, err := db.Query(statement, username)
